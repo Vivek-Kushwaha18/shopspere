@@ -179,7 +179,7 @@ export default function LoginPage() {
             <div className="h-px flex-1 bg-slate-200" />
           </div>
 
-          {/* Google Button */}
+          {/* Gdoogle Button */}
           <button
             type="button"
             className="w-full rounded-xl border border-slate-300 py-3.5 font-medium text-slate-700 transition hover:bg-slate-50"
