@@ -1,11 +1,16 @@
+
 "use client";
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
+  const router = useRouter();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +21,7 @@ export default function SignupPage() {
     e.preventDefault();
     setError("");
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !phone || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       return;
     }
@@ -34,19 +39,38 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      // Backend API will be connected here later
-      console.log("Signup:", {
-        name,
-        email,
-        password,
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/auth/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            phone,
+            password,
+          }),
+        }
+      );
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Signup failed.");
+      }
 
       alert("Account created successfully!");
 
-    } catch {
-      setError("Something went wrong. Please try again.");
+      // Go to login after successful signup
+      router.push("/login");
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -54,7 +78,6 @@ export default function SignupPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10">
-
       <div className="w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-xl grid md:grid-cols-2">
 
         {/* Left Section */}
@@ -154,6 +177,21 @@ export default function SignupPage() {
               />
             </div>
 
+            {/* Phone */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700">
+                Phone Number
+              </label>
+
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Enter your phone number"
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              />
+            </div>
+
             {/* Password */}
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -215,6 +253,7 @@ export default function SignupPage() {
                 className="text-sm text-slate-600"
               >
                 I agree to the{" "}
+
                 <Link
                   href="#"
                   className="font-medium text-blue-600"
@@ -274,3 +313,4 @@ export default function SignupPage() {
     </main>
   );
 }
+

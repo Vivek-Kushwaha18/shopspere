@@ -143,15 +143,15 @@ export default function Home() {
             {[
               {
                 name: "Electronics",
-                image: "/images/electronics.jpg",
+                image: "/images/electrical.jpg",
               },
               {
                 name: "Fashion",
-                image: "/images/fashion.jpg",
+                image: "/images/morgane.jpg",
               },
               {
                 name: "Beauty",
-                image: "/images/beauty.jpg",
+                image: "/images/pexels.jpg",
               },
               {
                 name: "Home & Living",

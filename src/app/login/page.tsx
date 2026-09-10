@@ -1,9 +1,13 @@
+
 "use client";
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -22,14 +26,37 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Backend API will be connected here later
-      console.log("Login:", { email, password });
+      const response = await fetch(
+        "http://127.0.0.1:8000/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const data = await response.json();
 
-      alert("Login successful!");
-    } catch {
-      setError("Something went wrong. Please try again.");
+      if (!response.ok) {
+        throw new Error(data.detail || "Invalid email or password.");
+      }
+
+      // Save JWT token
+      localStorage.setItem("access_token", data.access_token);
+
+      // Login successful → open Home page
+      router.push("/");
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -173,13 +200,15 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="my-7 flex items-center gap-4">
             <div className="h-px flex-1 bg-slate-200" />
+
             <span className="text-sm text-slate-400">
               OR
             </span>
+
             <div className="h-px flex-1 bg-slate-200" />
           </div>
 
-          {/* Gdoogle Button */}
+          {/* Google Button */}
           <button
             type="button"
             className="w-full rounded-xl border border-slate-300 py-3.5 font-medium text-slate-700 transition hover:bg-slate-50"
@@ -190,6 +219,7 @@ export default function LoginPage() {
           {/* Signup */}
           <p className="mt-8 text-center text-sm text-slate-600">
             Don't have an account?{" "}
+
             <Link
               href="/signup"
               className="font-semibold text-blue-600 hover:text-blue-700"
@@ -202,3 +232,4 @@ export default function LoginPage() {
     </main>
   );
 }
+
